@@ -1,0 +1,9 @@
+[
+  {"name": "Training 1", "summary": "This is training 1", "prereqs": [""], "time": 60},
+  {"name": "Training 2", "summary": "This is training 2", "prereqs": ["Training 1"], "time": 30},
+  {"name": "Training 3", "summary": "This is training 3", "prereqs": ["Training 1", "Training 2"], "time": 45},
+  {"name": "Training 4", "summary": "This is training 4", "prereqs": ["Training 2"], "time": 90},
+  {"name": "Training 5", "summary": "This is training 5", "prereqs": [""], "time": 30},
+  {"name": "Training 6", "summary": "This is training 6", "prereqs": ["Training 2", "Training 4"], "time": 90},
+  {"name": "Training 7", "summary": "This is training 7", "prereqs": ["Training 1", "Training 2", "Training 3", "Training 4", "Training 5", "Training 6"], "time": 30}
+]
