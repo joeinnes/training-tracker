@@ -262,7 +262,7 @@ var User = React.createClass({
 
               var SingleUser = React.createClass({
                 getInitialState: function() {
-                  return { usertype: "", user: this.props.user };
+                  return { usertype: "", coursesEligible: [], notCompleted: [] };
                 },
                 componentWillMount: function () {
 
@@ -278,8 +278,26 @@ var User = React.createClass({
                           break;
                           default:
                             this.setState({usertype: "Other"});
-                          }
-                        },
+                          };
+
+                    },
+                    componentDidMount: function() {
+                      var coursesCompleted = this.props.user.coursesCompleted;
+                      var coursesNotCompleted = trainingData;
+                      for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+                        console.log('Checking for matches for ' + coursesNotCompleted[i].name)
+                        var k = 0;
+                        for ( j = 0; j < coursesCompleted.length; j++ ) {
+                            if ( coursesNotCompleted[i].name == coursesCompleted[j] )
+                              k++;
+                            };
+                        if ( k > 0 ) {
+                            coursesNotCompleted.splice(i, 1)
+                            i = i-1;
+                        };
+                      };
+                      this.setState({notCompleted: coursesNotCompleted});
+                    },
                         render: function() {
                           return (
                             <div>
@@ -287,6 +305,7 @@ var User = React.createClass({
                               <p>{this.props.user.email}</p>
                               <p>{this.state.usertype}</p>
                               <CourseList data={this.props.user.coursesCompleted} />
+                              <CourseList data={this.state.notCompleted} />
                             </div>
                           );
                         }
