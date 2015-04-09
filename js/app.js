@@ -4,7 +4,7 @@ var userData = [
 ];
 
 var singleUser = [
-  {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]}
+  {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2", "Training 3"]}
 ];
 
 var trainingData = [
@@ -16,8 +16,6 @@ var trainingData = [
   {name: "Training 6", summary: "Training 6 (Summary)", type: 0, prereqs: ["Training 1", "Training 3"], time: 60},
   {name: "Training 7", summary: "Training 7 (Summary)", type: 1, prereqs: ["Training 4", "Training 3", "Training 2"], time: 60}
 ];
-
-var userid=0;
 
 
 var UserBox = React.createClass({
@@ -280,39 +278,66 @@ var User = React.createClass({
                             this.setState({usertype: "Other"});
                           };
 
-                    },
-                    componentDidMount: function() {
-                      var coursesCompleted = this.props.user.coursesCompleted;
-                      var coursesNotCompleted = trainingData;
-                      var namesCoursesNotCompleted = [];
-                      for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-                        var k = 0;
-                        for ( j = 0; j < coursesCompleted.length; j++ ) {
-                            if ( coursesNotCompleted[i].name == coursesCompleted[j] )
+                        },
+                        componentDidMount: function() {
+                          var coursesCompleted = this.props.user.coursesCompleted;
+                          var coursesNotCompleted = trainingData;
+                          var namesCoursesNotCompleted = [];
+                          for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+                            var k = 0;
+                            for ( j = 0; j < coursesCompleted.length; j++ ) {
+                              if ( coursesNotCompleted[i].name == coursesCompleted[j] )
                               k++;
                             };
-                        if ( k > 0 ) {
-                            coursesNotCompleted.splice(i, 1)
-                            i = i-1;
-                        };
-                      };
-                      for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-                        namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
-                      }
-                      this.setState({notCompleted: namesCoursesNotCompleted});
-                    },
+                            if ( k > 0 ) {
+                              coursesNotCompleted.splice(i, 1)
+                              i = i-1;
+                            };
+                          };
+                          for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+                            namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
+                          }
+                          this.setState({notCompleted: namesCoursesNotCompleted});
+
+                          var coursesEligible =[];
+                          for ( i = 0; i < coursesNotCompleted.length; i++ ) { // for all incomplete courses
+                            console.log('Am I eligible for ' + coursesNotCompleted[i].name + '?');
+                            if ( !coursesNotCompleted[i].prereqs.length ) {
+                              coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
+                              console.log('It has no prereqs, so yes!');
+                            } else {
+                              console.log('It has ' + coursesNotCompleted[i].prereqs.length +' prereqs.');
+                              var l = 0;
+                              for ( j = 0; j < coursesNotCompleted[i].prereqs.length; j++) { // for all prerequisites
+                                console.log('It depends, have I completed ' + coursesNotCompleted[i].prereqs[j] +'?');
+                                for ( k = 0; k < coursesCompleted.length; k++ ) { // for all completed courses
+                                  if ( coursesCompleted[k] == coursesNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
+                                    l++;
+                                    console.log('Yes! Thats ' + l + ' of ' + coursesNotCompleted[i].prereqs.length + ' met.');
+                                }
+
+                              if ( l == coursesNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
+                                coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
+                                console.log('I am eligible for ' + coursesNotCompleted[i].name + '.');
+                              }
+                            }
+                            }
+                          }
+                          };
+                          this.setState({coursesEligible: coursesEligible});
+                        },
                         render: function() {
                           return (
                             <div>
-                              <h1>{this.props.user.name}</h1>
-                              <p>{this.props.user.email}</p>
-                              <p>{this.state.usertype}</p>
-                              <h2>Completed</h2>
-                              <CourseList data={this.props.user.coursesCompleted} />
-                              <h2>Not Completed</h2>
-                              <CourseList data={this.state.notCompleted} />
-                              <h2>Eligible</h2>
-                              <CourseList data={this.state.coursesEligible} />
+                            <h1>{this.props.user.name}</h1>
+                            <p>{this.props.user.email}</p>
+                            <p>{this.state.usertype}</p>
+                            <h2>Completed</h2>
+                            <CourseList data={this.props.user.coursesCompleted} />
+                            <h2>Not Completed</h2>
+                            <CourseList data={this.state.notCompleted} />
+                            <h2>Eligible</h2>
+                            <CourseList data={this.state.coursesEligible} />
                             </div>
                           );
                         }
