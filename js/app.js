@@ -327,8 +327,8 @@ var userType = function(type) {
           };
         };
 
-/* Function to list courses not yet completed
-*/
+/* Function to list courses not yet completed */
+/* This iterates through two lists, and so is slow and needs optimisation */
 
 var coursesNotCompleted = function (userCompleted, courses) {
   var courseObj = courses;
@@ -351,6 +351,9 @@ var coursesNotCompleted = function (userCompleted, courses) {
   };
   return {courses: courseObj, names: names};
 };
+
+/* Function to check which courses a user is eligible for */
+/* This is iterating through three arrays, and so will be VERY slow */
 
 var coursesEligible = function (userCompleted, userNotCompleted) {
   console.log('coursesEligible called with ' + userCompleted.length + ' complete courses and ' + userNotCompleted.length + ' courses not complete.');
@@ -379,6 +382,25 @@ var coursesEligible = function (userCompleted, userNotCompleted) {
   };
   return {courses: eligible, names: names};
 };
+
+/* I can speed this up by adding the two arrays together and counting the matches and the prereqs */
+
+var amIEligibleFor = function(userCompleted, course) {
+  var l = 0;
+  for ( j = 0; j < course.prereqs.length; j++) { // for all prerequisites
+    for ( k = 0; k < userCompleted.length; k++ ) { // for all completed courses
+      if ( userCompleted[k] == course.prereqs[j] ) { // if completed course meets prereq, increment counter
+        l++;
+      }
+    }
+  }
+  if ( l == course.prereqs.length ) { // if all prereqs met, return true
+    return true;
+  } else {
+    return false
+  }
+}
+
 /* Render components on the page */
 
 React.render(
