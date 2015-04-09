@@ -1,3 +1,5 @@
+/* Declare variables */
+
 var userData = [
   {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]},
   {name: "Jordan Walke", email: "jordan.walke@example.com", type: 1, coursesCompleted: ["Training 2", "Training 3"]}
@@ -17,6 +19,8 @@ var trainingData = [
   {name: "Training 7", summary: "Training 7 (Summary)", type: 1, prereqs: ["Training 4", "Training 3", "Training 2"], time: 60}
 ];
 
+/* Create the UserBox component */
+/* There are two parts: the UserList and the UserForm (for adding users) */
 
 var UserBox = React.createClass({
 
@@ -31,6 +35,8 @@ var UserBox = React.createClass({
   }
 });
 
+/* Create the UserList component */
+/* Code creates a table to put the users in, then iterates through each item in the "data" prop, and passes each one to a User component as a single object */
 
 var UserList = React.createClass({
   render: function() {
@@ -47,6 +53,8 @@ var UserList = React.createClass({
   }
 });
 
+/* Create the UserForm component */
+/* This is not complete yet */
 
 var UserForm = React.createClass({
   handleSubmit: function(e) {
@@ -72,291 +80,306 @@ var UserForm = React.createClass({
   }
 });
 
+/* Create the user component */
+/* This sets a state - usertype, then calls a function to determine what type of user is being rendered. Then it renders key properties in a table row */
 
 var User = React.createClass({
   getInitialState: function() {
     return { usertype: "" };
   },
   componentWillMount: function () {
+    var type = userType(this.props.user.type);
+    this.setState({usertype: type});
+  },
+  render: function() {
+    return (
+      <tr className="user">
+      <td className="username">
+      {this.props.user.name}
+      </td>
+      <td className="email">
+      {this.props.user.email}
+      </td>
+      <td className="type">
+      {this.state.usertype}
+      </td>
+      <td className="coursesCompleted">
+      <CourseList data={this.props.user.coursesCompleted} />
+      </td>
+      </tr>
+    );
+  }
+});
 
-    switch(this.props.user.type) {
-      case 0:
-        this.setState({usertype: "Admin"});
+/* Create CourseList component */
+/* This component takes an object of courses, and lists them. It also has an optional variable, selectable, which switches between a ul and a multi select input field */
+
+var CourseList = React.createClass({
+  getInitialState: function() {
+    return { selectable: false };
+  },
+  componentWillMount: function() {
+    if ( this.props.selectable == true ) {
+      this.setState({selectable: true});
+    } else {
+      this.setState({selectable: false});
+    };
+  },
+  render: function() {
+    if ( this.state.selectable ) {
+      var courseNodes = this.props.data.map(function (course) {
+        return (
+          <option value={course.name}>{course.name}</option>
+        );
+      });
+      return (
+        <select multiple className="courseListSelectable">
+        {courseNodes}
+        </select>
+      );
+    } else {
+      var courseNodes = this.props.data.map(function (course) {
+        return (
+          <li>{course}</li>
+        );
+      });
+      return (
+        <ul className="courseList">
+        {courseNodes}
+        </ul>
+      );
+    }
+  }
+});
+
+// End user code, begin training modules
+
+/* Create the TrainingBox component */
+/* This component has a list and a form, and is more or less the same as the UserBox component */
+
+var TrainingBox = React.createClass({
+
+  render: function() {
+    return (
+      <div className="trainingBox">
+      <h1>Trainings</h1>
+      <TrainingList data={this.props.data} />
+      <TrainingForm />
+      </div>
+    )
+  }
+});
+
+/* Create the TrainingList component */
+/* As with the UserList component, this takes an object and renders each element individually */
+
+var TrainingList = React.createClass({
+  render: function() {
+    var trainingNodes = this.props.data.map(function (training) {
+      return (
+        <Training training={training} />
+      );
+    });
+    return (
+      <table className="trainingNodes">
+      {trainingNodes}
+      </table>
+    );
+  }
+});
+
+/* Create the TrainingForm component */
+/* This is incomplete */
+
+var TrainingForm = React.createClass({
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var name = React.findDOMNode(this.refs.name).value.trim();
+    var text = React.findDOMNode(this.refs.summary).value.trim();
+    if (!summary || !name) {
+      return;
+    }
+    // TODO: send request to the server
+    React.findDOMNode(this.refs.name).value = '';
+    React.findDOMNode(this.refs.summary).value = '';
+    return;
+  },
+  render: function() {
+    return (
+      <form className="trainingForm" onSubmit={this.handleSubmit}>
+      <input type="text" placeholder="Training name" ref="name" />
+      <input type="text" placeholder="Training summary" ref="summary" />
+      <CourseList selectable data={trainingData} />
+      <input type="submit" value="Post" />
+      </form>
+    );
+  }
+});
+
+/* Create the Training component */
+/* This creates a table row with properties for each training */
+
+var Training = React.createClass({
+  getInitialState: function() {
+    return { trainingtype: "" };
+  },
+  componentWillMount: function () {
+    var type = courseType(this.props.training.type);
+    this.setState({trainingtype: type});
+  },
+  render: function() {
+    return (
+      <tr className="training">
+      <td className="trainingname">
+      {this.props.training.name}
+      </td>
+      <td className="summary">
+      {this.props.training.summary}
+      </td>
+      <td className="type">
+      {this.state.trainingtype}
+      </td>
+      <td className="prerequisites">
+      <CourseList data={this.props.training.prereqs} />
+      </td>
+      </tr>
+    );
+  }
+});
+
+// Time for some single user code now
+
+/* Create the SingleUserBox component */
+/* This component takes a single user object, and renders a profile view */
+
+var SingleUserBox = React.createClass({
+  render: function() {
+    var user = this.props.user[0];
+    return(
+      <SingleUser user={user} />
+    )
+  }
+});
+
+/* Create the SingleUser component */
+/* This component returns all of the details for the user passed to it. It's probably too complex for a single component. */
+var SingleUser = React.createClass({
+  getInitialState: function() {
+    return { usertype: "", coursesEligible: [], notCompleted: [] };
+  },
+  componentWillMount: function () {
+    var type = userType(this.props.user.type);
+    this.setState({usertype: type});
+  },
+  componentDidMount: function() {
+    var coursesCompleted = this.props.user.coursesCompleted;
+    var coursesNotCompleted = trainingData;
+    var namesCoursesNotCompleted = [];
+    for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+      var k = 0;
+      for ( j = 0; j < coursesCompleted.length; j++ ) {
+        if ( coursesNotCompleted[i].name == coursesCompleted[j] )
+        k++;
+      };
+      if ( k > 0 ) {
+        coursesNotCompleted.splice(i, 1)
+        i = i-1;
+      };
+    };
+    for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+      namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
+    }
+    this.setState({notCompleted: namesCoursesNotCompleted});
+
+    var coursesEligible =[];
+    for ( i = 0; i < coursesNotCompleted.length; i++ ) { // for all incomplete courses
+      console.log('Am I eligible for ' + coursesNotCompleted[i].name + '?');
+      if ( !coursesNotCompleted[i].prereqs.length ) {
+        coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
+        console.log('It has no prereqs, so yes!');
+      } else {
+        console.log('It has ' + coursesNotCompleted[i].prereqs.length +' prereqs.');
+        var l = 0;
+        for ( j = 0; j < coursesNotCompleted[i].prereqs.length; j++) { // for all prerequisites
+          console.log('It depends, have I completed ' + coursesNotCompleted[i].prereqs[j] +'?');
+          for ( k = 0; k < coursesCompleted.length; k++ ) { // for all completed courses
+            if ( coursesCompleted[k] == coursesNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
+              l++;
+              console.log('Yes! Thats ' + l + ' of ' + coursesNotCompleted[i].prereqs.length +' met.');
+            }
+
+            if ( l == coursesNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
+              coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
+              console.log('I am eligible for ' + coursesNotCompleted[i].name + '.');
+            }
+          }
+        }
+      }
+    };
+    this.setState({coursesEligible: coursesEligible});
+  },
+  render: function() {
+    return (
+      <div>
+      <h1>{this.props.user.name}</h1>
+      <p>{this.props.user.email}</p>
+      <p>{this.state.usertype}</p>
+      <h2>Completed</h2>
+      <CourseList data={this.props.user.coursesCompleted} />
+      <h2>Not Completed</h2>
+      <CourseList data={this.state.notCompleted} />
+      <h2>Eligible</h2>
+      <CourseList data={this.state.coursesEligible} />
+      </div>
+    );
+  }
+});
+
+/* Set functions accessible by all components */
+
+var courseType = function(type) {
+  switch(type) {
+    case 0:
+      return "Onboarding";
+      break;
+      case 1:
+        return "In service";
         break;
-        case 1:
-          this.setState({usertype: "Trainer"});
+        default:
+          return "Other";
+        }
+      };
+
+var userType = function(type) {
+  switch(type) {
+    case 0:
+      return "Admin";
+      break;
+      case 1:
+        return "Trainer";
+        break;
+        case 2:
+          return "Trainee";
           break;
-          case 2:
-            this.setState({usertype: "Trainee"});
-            break;
-            default:
-              this.setState({usertype: "Other"});
-            }
-          },
-          render: function() {
-            return (
-              <tr className="user">
-              <td className="username">
-              {this.props.user.name}
-              </td>
-              <td className="email">
-              {this.props.user.email}
-              </td>
-              <td className="type">
-              {this.state.usertype}
-              </td>
-              <td className="coursesCompleted">
-              <CourseList data={this.props.user.coursesCompleted} />
-              </td>
-              </tr>
-            );
-          }
-        });
+          default:
+            return "Other";
+          };
+        };
 
 
-        var CourseList = React.createClass({
-          getInitialState: function() {
-            return { selectable: false };
-          },
-          componentWillMount: function() {
-            if ( this.props.selectable == true ) {
-              this.setState({selectable: true});
-            } else {
-              this.setState({selectable: false});
-            };
-          },
-          render: function() {
-            if ( this.state.selectable ) {
-              var courseNodes = this.props.data.map(function (course) {
-                return (
-                  <option value={course.name}>{course.name}</option>
-                );
-              });
-              return (
-                <select multiple className="courseListSelectable">
-                {courseNodes}
-                </select>
-              );
-            } else {
-              var courseNodes = this.props.data.map(function (course) {
-                return (
-                  <li>{course}</li>
-                );
-              });
-              return (
-                <ul className="courseList">
-                {courseNodes}
-                </ul>
-              );
-            }
-          }
-        });
+/* Render components on the page */
 
-        // End user code, begin training modules
+React.render(
+  <UserBox data={userData} />,
+  document.getElementById('userbox')
+);
 
-        var TrainingBox = React.createClass({
+React.render(
+  <TrainingBox data={trainingData} />,
+  document.getElementById('trainingbox')
+);
 
-          render: function() {
-            return (
-              <div className="trainingBox">
-              <h1>Trainings</h1>
-              <TrainingList data={this.props.data} />
-              <TrainingForm />
-              </div>
-            )
-          }
-        });
-
-
-        var TrainingList = React.createClass({
-          render: function() {
-            var trainingNodes = this.props.data.map(function (training) {
-              return (
-                <Training training={training} />
-              );
-            });
-            return (
-              <table className="trainingNodes">
-              {trainingNodes}
-              </table>
-            );
-          }
-        });
-
-
-        var TrainingForm = React.createClass({
-          handleSubmit: function(e) {
-            e.preventDefault();
-            var name = React.findDOMNode(this.refs.name).value.trim();
-            var text = React.findDOMNode(this.refs.summary).value.trim();
-            if (!summary || !name) {
-              return;
-            }
-            // TODO: send request to the server
-            React.findDOMNode(this.refs.name).value = '';
-            React.findDOMNode(this.refs.summary).value = '';
-            return;
-          },
-          render: function() {
-            return (
-              <form className="trainingForm" onSubmit={this.handleSubmit}>
-              <input type="text" placeholder="Training name" ref="name" />
-              <input type="text" placeholder="Training summary" ref="summary" />
-              <CourseList selectable data={trainingData} />
-              <input type="submit" value="Post" />
-              </form>
-            );
-          }
-        });
-
-
-        var Training = React.createClass({
-          getInitialState: function() {
-            return { trainingtype: "" };
-          },
-          componentWillMount: function () {
-
-            switch(this.props.training.type) {
-              case 0:
-                this.setState({trainingtype: "Onboarding"});
-                break;
-                case 1:
-                  this.setState({trainingtype: "In service"});
-                  break;
-                  default:
-                    this.setState({trainingtype: "Other"});
-                  }
-                },
-                render: function() {
-                  return (
-                    <tr className="training">
-                    <td className="trainingname">
-                    {this.props.training.name}
-                    </td>
-                    <td className="summary">
-                    {this.props.training.summary}
-                    </td>
-                    <td className="type">
-                    {this.state.trainingtype}
-                    </td>
-                    <td className="prerequisites">
-                    <CourseList data={this.props.training.prereqs} />
-                    </td>
-                    </tr>
-                  );
-                }
-              });
-
-              // Time for some single user code now
-
-              var SingleUserBox = React.createClass({
-                render: function() {
-                  var user = this.props.user[0];
-                  return(
-                    <SingleUser user={user} />
-                  )
-                }
-              });
-
-              var SingleUser = React.createClass({
-                getInitialState: function() {
-                  return { usertype: "", coursesEligible: [], notCompleted: [] };
-                },
-                componentWillMount: function () {
-
-                  switch(this.props.user.type) {
-                    case 0:
-                      this.setState({usertype: "Admin"});
-                      break;
-                      case 1:
-                        this.setState({usertype: "Trainer"});
-                        break;
-                        case 2:
-                          this.setState({usertype: "Trainee"});
-                          break;
-                          default:
-                            this.setState({usertype: "Other"});
-                          };
-
-                        },
-                        componentDidMount: function() {
-                          var coursesCompleted = this.props.user.coursesCompleted;
-                          var coursesNotCompleted = trainingData;
-                          var namesCoursesNotCompleted = [];
-                          for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-                            var k = 0;
-                            for ( j = 0; j < coursesCompleted.length; j++ ) {
-                              if ( coursesNotCompleted[i].name == coursesCompleted[j] )
-                              k++;
-                            };
-                            if ( k > 0 ) {
-                              coursesNotCompleted.splice(i, 1)
-                              i = i-1;
-                            };
-                          };
-                          for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-                            namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
-                          }
-                          this.setState({notCompleted: namesCoursesNotCompleted});
-
-                          var coursesEligible =[];
-                          for ( i = 0; i < coursesNotCompleted.length; i++ ) { // for all incomplete courses
-                            console.log('Am I eligible for ' + coursesNotCompleted[i].name + '?');
-                            if ( !coursesNotCompleted[i].prereqs.length ) {
-                              coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
-                              console.log('It has no prereqs, so yes!');
-                            } else {
-                              console.log('It has ' + coursesNotCompleted[i].prereqs.length +' prereqs.');
-                              var l = 0;
-                              for ( j = 0; j < coursesNotCompleted[i].prereqs.length; j++) { // for all prerequisites
-                                console.log('It depends, have I completed ' + coursesNotCompleted[i].prereqs[j] +'?');
-                                for ( k = 0; k < coursesCompleted.length; k++ ) { // for all completed courses
-                                  if ( coursesCompleted[k] == coursesNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
-                                    l++;
-                                    console.log('Yes! Thats ' + l + ' of ' + coursesNotCompleted[i].prereqs.length + ' met.');
-                                }
-
-                              if ( l == coursesNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
-                                coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
-                                console.log('I am eligible for ' + coursesNotCompleted[i].name + '.');
-                              }
-                            }
-                            }
-                          }
-                          };
-                          this.setState({coursesEligible: coursesEligible});
-                        },
-                        render: function() {
-                          return (
-                            <div>
-                            <h1>{this.props.user.name}</h1>
-                            <p>{this.props.user.email}</p>
-                            <p>{this.state.usertype}</p>
-                            <h2>Completed</h2>
-                            <CourseList data={this.props.user.coursesCompleted} />
-                            <h2>Not Completed</h2>
-                            <CourseList data={this.state.notCompleted} />
-                            <h2>Eligible</h2>
-                            <CourseList data={this.state.coursesEligible} />
-                            </div>
-                          );
-                        }
-                      });
-
-
-
-
-                      React.render(
-                        <UserBox data={userData} />,
-                        document.getElementById('userbox')
-                      );
-
-                      React.render(
-                        <TrainingBox data={trainingData} />,
-                        document.getElementById('trainingbox')
-                      );
-
-                      React.render(
-                        <SingleUserBox user={singleUser} />,
-                        document.getElementById('singleuserbox')
-                      );
+React.render(
+  <SingleUserBox user={singleUser} />,
+  document.getElementById('singleuserbox')
+);
