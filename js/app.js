@@ -263,6 +263,7 @@ var SingleUserBox = React.createClass({
 
 /* Create the SingleUser component */
 /* This component returns all of the details for the user passed to it. It's probably too complex for a single component. */
+
 var SingleUser = React.createClass({
   getInitialState: function() {
     return { usertype: "", coursesEligible: [], notCompleted: [] };
@@ -272,51 +273,11 @@ var SingleUser = React.createClass({
     this.setState({usertype: type});
   },
   componentDidMount: function() {
-    var coursesCompleted = this.props.user.coursesCompleted;
-    var coursesNotCompleted = trainingData;
-    var namesCoursesNotCompleted = [];
-    for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-      var k = 0;
-      for ( j = 0; j < coursesCompleted.length; j++ ) {
-        if ( coursesNotCompleted[i].name == coursesCompleted[j] )
-        k++;
-      };
-      if ( k > 0 ) {
-        coursesNotCompleted.splice(i, 1)
-        i = i-1;
-      };
-    };
-    for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-      namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
-    }
-    this.setState({notCompleted: namesCoursesNotCompleted});
+    var notCompleted = coursesNotCompleted(this.props.user.coursesCompleted, trainingData)
+    this.setState({notCompleted: notCompleted.names});
 
-    var coursesEligible =[];
-    for ( i = 0; i < coursesNotCompleted.length; i++ ) { // for all incomplete courses
-      console.log('Am I eligible for ' + coursesNotCompleted[i].name + '?');
-      if ( !coursesNotCompleted[i].prereqs.length ) {
-        coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
-        console.log('It has no prereqs, so yes!');
-      } else {
-        console.log('It has ' + coursesNotCompleted[i].prereqs.length +' prereqs.');
-        var l = 0;
-        for ( j = 0; j < coursesNotCompleted[i].prereqs.length; j++) { // for all prerequisites
-          console.log('It depends, have I completed ' + coursesNotCompleted[i].prereqs[j] +'?');
-          for ( k = 0; k < coursesCompleted.length; k++ ) { // for all completed courses
-            if ( coursesCompleted[k] == coursesNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
-              l++;
-              console.log('Yes! Thats ' + l + ' of ' + coursesNotCompleted[i].prereqs.length +' met.');
-            }
-
-            if ( l == coursesNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
-              coursesEligible[coursesEligible.length] = coursesNotCompleted[i].name;
-              console.log('I am eligible for ' + coursesNotCompleted[i].name + '.');
-            }
-          }
-        }
-      }
-    };
-    this.setState({coursesEligible: coursesEligible});
+    var eligible = coursesEligible(this.props.user.coursesCompleted, notCompleted.courses);
+    this.setState({coursesEligible: eligible.names});
   },
   render: function() {
     return (
@@ -366,7 +327,58 @@ var userType = function(type) {
           };
         };
 
+/* Function to list courses not yet completed
+*/
 
+var coursesNotCompleted = function (userCompleted, courses) {
+  var courseObj = courses;
+  var names = [];
+  console.log('coursesNotCompleted called with ' + courses.length + ' courses and ' + userCompleted.length + ' completed courses.' );
+
+  for ( i = 0; i < courseObj.length; i++ ) {
+    var k = 0;
+    for ( j = 0; j < userCompleted.length; j++ ) {
+      if ( courseObj[i].name == userCompleted[j] )
+      k++;
+    };
+    if ( k > 0 ) {
+      courseObj.splice(i, 1)
+      i = i-1;
+    };
+  };
+  for ( i = 0; i < courseObj.length; i++ ) {
+    names[names.length] = courseObj[i].name;
+  };
+  return {courses: courseObj, names: names};
+};
+
+var coursesEligible = function (userCompleted, userNotCompleted) {
+  console.log('coursesEligible called with ' + userCompleted.length + ' complete courses and ' + userNotCompleted.length + ' courses not complete.');
+  var eligible = [];
+  var names = [];
+  for ( i = 0; i < userNotCompleted.length; i++ ) { // for all incomplete courses
+    if ( !userNotCompleted[i].prereqs.length ) {
+      eligible[eligible.length] = userNotCompleted[i];
+    } else {
+      var l = 0;
+      for ( j = 0; j < userNotCompleted[i].prereqs.length; j++) { // for all prerequisites
+        for ( k = 0; k < userCompleted.length; k++ ) { // for all completed courses
+          if ( userCompleted[k] == userNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
+            l++;
+          }
+
+          if ( l == userNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
+            eligible[eligible.length] = userNotCompleted[i];
+          }
+        }
+      }
+    }
+  }
+  for ( i = 0; i < eligible.length; i++ ) {
+    names[names.length] = eligible[i].name;
+  };
+  return {courses: eligible, names: names};
+};
 /* Render components on the page */
 
 React.render(
