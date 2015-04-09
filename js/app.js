@@ -1,10 +1,11 @@
 var userData = [
-  {name: "Pete Hunt", email: "pete.hunt@diageo.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]},
-  {name: "Jordan Walke", email: "jordan.walke@diageo.com", type: 1, coursesCompleted: ["Training 2", "Training 3"]}
+  {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]},
+  {name: "Jordan Walke", email: "jordan.walke@example.com", type: 1, coursesCompleted: ["Training 2", "Training 3"]}
 ];
 
 var singleUser = [
-  {name: "Pete Hunt", email: "pete.hunt@diageo.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]}];
+  {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"]}
+];
 
 var trainingData = [
   {name: "Training 1", summary: "Training 1 (Summary)", type: 0, prereqs: [], time: 30},
@@ -251,27 +252,60 @@ var User = React.createClass({
               // Time for some single user code now
 
               var SingleUserBox = React.createClass({
-                componentWillMount: function() {
-                  console.log(this.props.user.name);
-                },
                 render: function() {
+                  var user = this.props.user[0];
                   return(
-                    <h1>{this.props.user.name}</h1>
+                    <SingleUser user={user} />
                   )
                 }
-              })
+              });
 
-              React.render(
-                <UserBox data={userData} />,
-                document.getElementById('userbox')
-              );
+              var SingleUser = React.createClass({
+                getInitialState: function() {
+                  return { usertype: "", user: this.props.user };
+                },
+                componentWillMount: function () {
 
-              React.render(
-                <TrainingBox data={trainingData} />,
-                document.getElementById('trainingbox')
-              );
+                  switch(this.props.user.type) {
+                    case 0:
+                      this.setState({usertype: "Admin"});
+                      break;
+                      case 1:
+                        this.setState({usertype: "Trainer"});
+                        break;
+                        case 2:
+                          this.setState({usertype: "Trainee"});
+                          break;
+                          default:
+                            this.setState({usertype: "Other"});
+                          }
+                        },
+                        render: function() {
+                          return (
+                            <div>
+                              <h1>{this.props.user.name}</h1>
+                              <p>{this.props.user.email}</p>
+                              <p>{this.state.usertype}</p>
+                              <CourseList data={this.props.user.coursesCompleted} />
+                            </div>
+                          );
+                        }
+                      });
 
-              React.render(
-                <SingleUserBox user={singleUser} />,
-                document.getElementById('singleuserbox')
-              );
+
+
+
+                      React.render(
+                        <UserBox data={userData} />,
+                        document.getElementById('userbox')
+                      );
+
+                      React.render(
+                        <TrainingBox data={trainingData} />,
+                        document.getElementById('trainingbox')
+                      );
+
+                      React.render(
+                        <SingleUserBox user={singleUser} />,
+                        document.getElementById('singleuserbox')
+                      );
