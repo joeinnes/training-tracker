@@ -284,8 +284,8 @@ var User = React.createClass({
                     componentDidMount: function() {
                       var coursesCompleted = this.props.user.coursesCompleted;
                       var coursesNotCompleted = trainingData;
+                      var namesCoursesNotCompleted = [];
                       for ( i = 0; i < coursesNotCompleted.length; i++ ) {
-                        console.log('Checking for matches for ' + coursesNotCompleted[i].name)
                         var k = 0;
                         for ( j = 0; j < coursesCompleted.length; j++ ) {
                             if ( coursesNotCompleted[i].name == coursesCompleted[j] )
@@ -296,7 +296,10 @@ var User = React.createClass({
                             i = i-1;
                         };
                       };
-                      this.setState({notCompleted: coursesNotCompleted});
+                      for ( i = 0; i < coursesNotCompleted.length; i++ ) {
+                        namesCoursesNotCompleted[namesCoursesNotCompleted.length] = coursesNotCompleted[i].name;
+                      }
+                      this.setState({notCompleted: namesCoursesNotCompleted});
                     },
                         render: function() {
                           return (
@@ -304,8 +307,12 @@ var User = React.createClass({
                               <h1>{this.props.user.name}</h1>
                               <p>{this.props.user.email}</p>
                               <p>{this.state.usertype}</p>
+                              <h2>Completed</h2>
                               <CourseList data={this.props.user.coursesCompleted} />
+                              <h2>Not Completed</h2>
                               <CourseList data={this.state.notCompleted} />
+                              <h2>Eligible</h2>
+                              <CourseList data={this.state.coursesEligible} />
                             </div>
                           );
                         }
