@@ -4,13 +4,37 @@
   <script src="js/react.js"></script>
   <script src="js/jsx.js"></script>
   <script src="js/jquery-2.1.3.min.js"></script>
-  <script src="js/app.js" type="text/jsx"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-multiselect.js"></script>
+  <script src="js/app.jsx" type="text/jsx"></script>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css">
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <div id="userbox"></div>
-  <hr />
-  <div id="trainingbox"></div>
-  <hr />
-  <div id="singleuserbox"></div>
+  <nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        <p>Employee Training Tracker</p>
+      </a>
+    </div>
+  </div>
+</nav>
+  <div class="container">
+    <div id="userbox"></div>
+    <hr />
+    <div id="trainingbox"></div>
+    <hr />
+    <div id="singleuserbox"></div>
+  </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        console.log('Looking for selects!');
+    });
+</script>
+
 </body>
 </html>
