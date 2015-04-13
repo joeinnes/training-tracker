@@ -149,9 +149,10 @@ var CourseList = React.createClass({
   render: function() {
     var courseNodes = "";
     if ( this.state.selectable ) {
+      // console.log(this.props.data);
       courseNodes = this.props.data.map(function (course) {
         return (
-          <option value={course.name}>{course.name}</option>
+          <option value={course}>{course}</option>
         );
       });
       return (
@@ -305,31 +306,46 @@ var SingleUserBox = React.createClass({
 
 var SingleUser = React.createClass({
   getInitialState: function() {
-    return { usertype: "", coursesEligible: [], notCompleted: [] };
+    return { usertype: "", coursesEligible: {}, coursesEligibleNames: [], notCompleted: {}, notCompletedNames: []};
   },
   componentWillMount: function () {
     var type = userType(this.props.user.type);
     this.setState({usertype: type});
   },
   componentDidMount: function() {
-    var notCompleted = coursesNotCompleted(this.props.user.coursesCompleted, trainingData)
-    this.setState({notCompleted: notCompleted.names});
+    var i = 0;
+    var names = [];
+    var eligibleNames = [];
 
-    var eligible = coursesEligible(this.props.user.coursesCompleted, notCompleted.courses);
-    this.setState({coursesEligible: eligible.names});
+    var notCompleted = coursesNotCompleted(this.props.user.coursesCompleted, trainingData);
+    for ( i = 0; i < notCompleted.length; i++) {
+      names.push(notCompleted[i].name);
+    }
+    this.setState({notCompletedNames: names});
+
+    var eligible = coursesEligible(this.props.user.coursesCompleted, notCompleted);
+    for ( i = 0; i < eligible.length; i++) {
+      eligibleNames.push(eligible[i].name);
+    }
+    this.setState({coursesEligible: eligible, coursesEligibleNames: eligibleNames});
   },
   render: function() {
     return (
-      <div>
-        <h1>{this.props.user.name}</h1>
+      <div className="row">
+        <h1>{this.props.user.name} <span className="label label-success pull-right">{this.state.usertype}</span></h1>
         <p>{this.props.user.email}</p>
-        <p>{this.state.usertype}</p>
-        <h2>Completed</h2>
-        <CourseList data={this.props.user.coursesCompleted} />
-        <h2>Not Completed</h2>
-        <CourseList data={this.state.notCompleted} />
-        <h2>Eligible</h2>
-        <CourseList data={this.state.coursesEligible} />
+        <div className="col-md-4">
+          <h2>Completed</h2>
+          <CourseList data={this.props.user.coursesCompleted} />
+        </div>
+        <div className="col-md-4">
+          <h2>Not Completed</h2>
+          <CourseList data={this.state.notCompletedNames} />
+        </div>
+        <div className="col-md-4">
+          <h2>Eligible</h2>
+          <CourseList data={this.state.coursesEligibleNames} />
+        </div>
       </div>
     );
   }
@@ -348,110 +364,97 @@ var courseType = function (type) {
         }
       };
 
-      var userType = function (type) {
-        switch(type) {
-          case 0:
-            return "Admin";
-            case 1:
-              return "Trainer";
-              case 2:
-                return "Trainee";
-                default:
-                  return "Other";
-                }
-              };
+var userType = function (type) {
+  switch(type) {
+    case 0:
+      return "Admin";
+      case 1:
+        return "Trainer";
+        case 2:
+          return "Trainee";
+          default:
+            return "Other";
+          }
+        };
 
               /* Function to list courses not yet completed */
               /* This iterates through two lists, and so is slow and needs optimisation */
 
-              var coursesNotCompleted = function (userCompleted, courses) {
-                var i, j, k;
-                var courseObj = courses;
-                var names = [];
-                console.log('coursesNotCompleted called with ' + courses.length + ' courses and ' + userCompleted.length + ' completed courses.' );
+var coursesNotCompleted = function (userCompleted, courses) {
+  // I need to get all of the object for each userCompleted
+  var i = 0;
+  var completedObj = [];
+  var completed;
+  for ( i = 0; i < userCompleted.length; i++ ) {
+    completed = objFromName(userCompleted[i]);
+    completedObj.push(completed);
+  }
+  for ( i = 0; i < completedObj.length; i++ ) {
+    for ( var j = 0, len = courses.length; j < len; j++) {
+      if ( completedObj[i].name === courses[j].name ) {
+        courses.splice(j, 1);
+        len = courses.len;
+      }
+    }
+  }
+  // courseObj = courses.filter(function(item) {return item !== undefined});
+  return courses;
+};
 
-                for ( i = 0; i < courseObj.length; i++ ) {
-                  k = 0;
-                  for ( j = 0; j < userCompleted.length; j++ ) {
-                    if ( courseObj[i].name === userCompleted[j] ) {
-                      k++;
-                    }
-                  }
-                  if ( k > 0 ) {
-                    courseObj.splice(i, 1)
-                    i = i-1;
-                  }
-                }
-                for ( i = 0; i < courseObj.length; i++ ) {
-                  names[names.length] = courseObj[i].name;
-                }
-                return {courses: courseObj, names: names};
-              };
+/* Utility function to list all of the courses a user is eligible for as objects and names */
 
-              /* Function to check which courses a user is eligible for */
-              /* This is iterating through three arrays, and so will be VERY slow */
+var coursesEligible = function (userCompleted, userNotCompleted) {
+  var eligible = [];
+  var i;
+  for ( i = 0; i < userNotCompleted.length; i++ ) { // for all incomplete courses
+    if ( amIEligibleFor(userCompleted, userNotCompleted[i].prereqs) ) {
+      eligible.push(userNotCompleted[i]);
+    }
+  }
+  return eligible;
+};
 
-              var coursesEligible = function (userCompleted, userNotCompleted) {
-                console.log('coursesEligible called with ' + userCompleted.length + ' complete courses and ' + userNotCompleted.length + ' courses not complete.');
-                var eligible = [];
-                var names = [];
-                var i, j, k, l;
-                for ( i = 0; i < userNotCompleted.length; i++ ) { // for all incomplete courses
-                  if ( !userNotCompleted[i].prereqs.length ) {
-                    eligible[eligible.length] = userNotCompleted[i];
-                  } else {
-                    l = 0;
-                    for ( j = 0; j < userNotCompleted[i].prereqs.length; j++) { // for all prerequisites
-                      for ( k = 0; k < userCompleted.length; k++ ) { // for all completed courses
-                        if ( userCompleted[k] === userNotCompleted[i].prereqs[j] ) { // if completed course meets prereq, increment counter
-                          l++;
-                        }
+/* Utility function to check to see if a user is eligible for a course */
 
-                        if ( l === userNotCompleted[i].prereqs.length ) { // if all prereqs met, add to eligible array
-                          eligible[eligible.length] = userNotCompleted[i];
-                        }
-                      }
-                    }
-                  }
-                }
-                for ( i = 0; i < eligible.length; i++ ) {
-                  names[names.length] = eligible[i].name;
-                }
-                return {courses: eligible, names: names};
-              };
+var amIEligibleFor = function(userCompleted, coursePrereqs) {
+  var i, j;
+  j = 0;
+  var conCat = userCompleted.concat(coursePrereqs); // put the two arrays together
+  conCat.sort(); // then sort them
+  for ( i = 0; i < conCat.length; i++) { // then check each item against the next to see if they match
+    if ( conCat[i] === conCat[i+1] ) {
+        j++; // if they do, then increment the counter
+      }
+    }
+  if ( j === coursePrereqs.length ) { // if all prereqs met, return true
+    return true;
+  } else {
+    return false;
+  }
+};
 
-              /* I can speed this up by adding the two arrays together and counting the matches and the prereqs */
+var objFromName = function(name) {
+  var i = 0;
+  for ( i = 0; i < trainingData.length; i++ ) {
+    if ( name === trainingData[i].name ) {
+        return trainingData[i];
+    }
+  }
+};
 
-              /* var amIEligibleFor = function(userCompleted, course) {
-              var j, k, l;
-              l = 0;
-              for ( j = 0; j < course.prereqs.length; j++) { // for all prerequisites
-              for ( k = 0; k < userCompleted.length; k++ ) { // for all completed courses
-              if ( userCompleted[k] === course.prereqs[j] ) { // if completed course meets prereq, increment counter
-              l++;
-              }
-              }
-              }
-              if ( l === course.prereqs.length ) { // if all prereqs met, return true
-              return true;
-              } else {
-              return false;
-              }
-              } */
+/* Render components on the page */
 
-              /* Render components on the page */
+React.render(
+  <UserBox data={userData} />,
+  document.getElementById('userbox')
+);
 
-              React.render(
-                <UserBox data={userData} />,
-                document.getElementById('userbox')
-              );
+React.render(
+  <TrainingBox data={trainingData} />,
+  document.getElementById('trainingbox')
+);
 
-              React.render(
-                <TrainingBox data={trainingData} />,
-                document.getElementById('trainingbox')
-              );
-
-              React.render(
-                <SingleUserBox user={singleUser} />,
-                document.getElementById('singleuserbox')
-              );
+React.render(
+  <SingleUserBox user={singleUser} />,
+  document.getElementById('singleuserbox')
+);
