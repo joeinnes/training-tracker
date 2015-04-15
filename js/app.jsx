@@ -23,6 +23,9 @@ var singleCourse = [
 {name: "Training 7", summary: "Training 7 (Summary)", type: 1, prereqs: ["Training 4", "Training 3", "Training 2"], time: 1}
 ];
 
+var singleSession = [
+{name: "Training 1", startTime: 1420099200, endTime: 1420102800, trainees: ["Pete Hunt"], trainer: "Jordan Walke" }
+];
 /* ============================= Views ============================= */
 
 /* The UserBox component renders a list of users and a user add form underneath the heading "Users"
@@ -357,7 +360,7 @@ var TrainingForm = React.createClass({
 
 var TrainingAdd = React.createClass({
   getInitialState: function() {
-    return { userNames: "" }
+    return { userNames: "", trainers: [] }
   },
   handleSubmit: function(e) {
     e.preventDefault();
@@ -370,6 +373,13 @@ var TrainingAdd = React.createClass({
     React.findDOMNode(this.refs.name).value = '';
     React.findDOMNode(this.refs.summary).value = '';
     return;
+  },
+  componentWillMount: function() {
+    for ( var i = 0; i < userData.length; i++ ) {
+      if ( userData[i].type === 1 ) {
+        this.state.trainers.push(userData[i].name);
+      }
+    }
   },
   componentDidMount: function() {
     $('select').multiselect({
@@ -387,7 +397,7 @@ var TrainingAdd = React.createClass({
         </div>
         <div className="form-group">
           <label for="summary">Trainer</label>
-          <input type="text" placeholder="Training summary" ref="summary" className="form-control" />
+            <ItemList selectable items={this.state.trainers} />
         </div>
         <div className="form-group">
           <label for="user-list">Users</label>
@@ -399,6 +409,27 @@ var TrainingAdd = React.createClass({
   }
 });
 
+var SingleSession = React.createClass({
+  render: function () {
+    var session = this.props.session[0];
+    // var d = new Date();
+    var startTime = niceDate(session.startTime);
+    var endTime = niceDate(session.endTime);
+    return (
+      <div>
+        <h1>{session.name}</h1>
+        <h2>Trainees</h2>
+        <p><ItemList items={session.trainees} /></p>
+        <h2>Trainer</h2>
+        <p>{session.trainer}</p>
+        <h2>Times</h2>
+        <p>Start: {startTime.date} at {startTime.time}</p>
+        <p>End: {endTime.date} at {endTime.time}</p>
+        <p>Duration: {(session.endTime - session.startTime)/60} minutes</p>
+      </div>
+    )
+  }
+});
 /* ============================= Functions ============================= */
 
 /* The courseType function takes a type number, and returns a human readable value
@@ -508,6 +539,23 @@ var namesFromObj = function(obj) {
   }
   return results;
 }
+
+var niceDate = function(data) {
+  var date = new Date();
+  date.setTime(data*1000);
+  var day = date.getDate();
+  var month = date.getMonth()+1;
+  var year = date.getFullYear();
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+
+  if ( hours.toString().length < 2 ) { hours = "0"+hours }
+  if ( minutes.toString().length < 2 ) { minutes = "0"+minutes }
+  var niceDate = day + "/" + month + "/" + year;
+  var niceTime = hours + ":" + minutes;
+  var result = { date: niceDate, time: niceTime };
+  return result;
+}
 /* Render components on the page */
 
 React.render(
@@ -534,3 +582,8 @@ React.render(
   <TrainingAdd />,
   document.getElementById('trainingadd')
 );
+
+React.render(
+  <SingleSession session={singleSession} />,
+  document.getElementById('singlesession')
+)
