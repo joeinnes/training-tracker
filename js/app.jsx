@@ -24,7 +24,7 @@ var singleCourse = [
 ];
 
 var singleSession = [
-{name: "Training 1", startTime: 1420099200, endTime: 1420102800, trainees: ["Pete Hunt"], trainer: "Jordan Walke" }
+{name: "Training 1", startTime: 1420099200, endTime: 1420102800, trainees: ["Pete Hunt", "Bill Cosby"], trainer: "Jordan Walke" }
 ];
 /* ============================= Views ============================= */
 
@@ -409,27 +409,59 @@ var TrainingAdd = React.createClass({
   }
 });
 
+var SingleSessionBox = React.createClass({
+  render: function () {
+    return (
+      <table className="table table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Participants</th>
+          <th>Employee ID</th>
+          <th>Trainer</th>
+          <th>Employee ID</th>
+          <th>Start Date</th>
+          <th>Start Time</th>
+          <th>End Date</th>
+          <th>End Time</th>
+          <th>Duration</th>
+        </tr>
+        <SingleSession session={this.props.session} />
+      </table>
+    )
+  }
+});
+
 var SingleSession = React.createClass({
   render: function () {
     var session = this.props.session[0];
     // var d = new Date();
     var startTime = niceDate(session.startTime);
     var endTime = niceDate(session.endTime);
+    var sessions = this.props.session[0].trainees.map(function (trainee) {
+        return (
+          <tr>
+            <td>{session.name}</td>
+            <td>{trainee}</td>
+            <td>{userObjFromName(trainee).empid}</td>
+            <td>{session.trainer}</td>
+            <td>{userObjFromName(session.trainer).empid}</td>
+            <td>{startTime.date}</td>
+            <td>{startTime.time}</td>
+            <td>{endTime.date}</td>
+            <td>{endTime.time}</td>
+            <td>{(session.endTime - session.startTime)/60} minutes</td>
+          </tr>
+        )
+    });
+    // console.log(sessions);
     return (
       <div>
-        <h1>{session.name}</h1>
-        <h2>Trainees</h2>
-        <p><ItemList items={session.trainees} /></p>
-        <h2>Trainer</h2>
-        <p>{session.trainer}</p>
-        <h2>Times</h2>
-        <p>Start: {startTime.date} at {startTime.time}</p>
-        <p>End: {endTime.date} at {endTime.time}</p>
-        <p>Duration: {(session.endTime - session.startTime)/60} minutes</p>
-      </div>
+      {sessions}
+    </div>
     )
   }
 });
+
 /* ============================= Functions ============================= */
 
 /* The courseType function takes a type number, and returns a human readable value
@@ -532,6 +564,16 @@ var objFromName = function(name) {
   }
 };
 
+var userObjFromName = function(name) {
+  var i = 0;
+  for ( i = 0; i < userData.length; i++ ) {
+    if ( name === userData[i].name ) {
+        return userData[i];
+    }
+  }
+  return "None";
+};
+
 var namesFromObj = function(obj) {
   var results = [];
   for ( var i = 0; i < obj.length; i++ ) {
@@ -584,6 +626,6 @@ React.render(
 );
 
 React.render(
-  <SingleSession session={singleSession} />,
+  <SingleSessionBox session={singleSession} />,
   document.getElementById('singlesession')
 )
