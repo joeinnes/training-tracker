@@ -110,6 +110,10 @@ var ItemList = React.createClass({
   },
   render: function() {
     var itemNodes = "";
+    var multiple = true;
+    if ( this.props.single ) {
+      multiple = false;
+    }
     if ( this.props.selectable ) {
       // console.log(this.props.data);
       itemNodes = this.props.items.map(function (item) {
@@ -118,7 +122,7 @@ var ItemList = React.createClass({
         );
       });
       return (
-        <select id={this.props.componentId} multiple="multiple" className="itemListSelectable form-control">
+        <select id={this.props.componentId} multiple={multiple} className="itemListSelectable form-control">
           {itemNodes}
         </select>
       );
@@ -563,7 +567,7 @@ var TrainingAdd = React.createClass({
         <form className="trainingAddForm form-inline" onSubmit={this.handleSubmit}>
           <div className="form-group col-md-2">
             <label for="coursename">Course name</label><br />
-              <ItemList componentId="coursename" selectable items={namesFromObj(trainingData)} />
+              <ItemList componentId="coursename" selectable single items={namesFromObj(trainingData)} />
           </div>
           <div className="form-group col-md-2">
             <label for="summary">Trainer</label><br />
