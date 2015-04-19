@@ -1,4 +1,9 @@
 /* Declare variables */
+var nanobar = new Nanobar({
+  bg: '#000',
+  id: 'load'
+});
+nanobar.go(10);
 
 var userData = [
 {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"], empid: 8675309 },
@@ -32,6 +37,7 @@ var singleSession = [
 Props: data (full object of users) */
 var UserBox = React.createClass({
   render: function() {
+    nanobar.go(20);
     return (
       <div className="userBox">
         <h1>Users</h1>
@@ -141,6 +147,7 @@ Props: data (full object of courses) */
 var TrainingBox = React.createClass({
 
   render: function() {
+    nanobar.go(40);
     return (
       <div className="trainingBox">
         <h1>Trainings</h1>
@@ -209,6 +216,7 @@ Props: user (single user object)*/
 var SingleUserBox = React.createClass({
   render: function() {
     var user = this.props.user[0];
+    nanobar.go(60);
     return(
       <SingleUser user={user} />
     )
@@ -263,6 +271,7 @@ var SingleCourseBox = React.createClass({
   },
   render: function() {
     var course = this.props.course[0];
+    nanobar.go(70);
     return (
       <div className="singleCourse">
         <div className="row">
@@ -289,6 +298,7 @@ var SingleCourseBox = React.createClass({
 
 var SingleSessionBox = React.createClass({
   render: function () {
+    nanobar.go(90);
     return (
       <table className="table table-striped">
         <tr>
@@ -477,13 +487,18 @@ var TrainingAdd = React.createClass({
   },
   handleSubmit: function(e) {
     e.preventDefault();
+    nanobar.go(10);
     var payload = {};
     payload.trainingname = $('#trainingname').val();
     payload.trainername = $('#trainername').val();
+    nanobar.go(33);
     payload.trainees = $('#trainees').val();
     payload.starttime = $('#starttime').val();
+    nanobar.go(90);
     payload.endtime = $('#endtime').val();
     console.log('Payload built!');
+    console.log(payload);
+    nanobar.go(100);
   },
   componentWillMount: function() {
     for ( var i = 0; i < userData.length; i++ ) {
@@ -701,3 +716,5 @@ React.render(
   <SingleSessionBox session={singleSession} />,
   document.getElementById('singlesession')
 )
+
+nanobar.go(100);
