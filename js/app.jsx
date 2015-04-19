@@ -554,8 +554,8 @@ var TrainingAdd = React.createClass({
       maxHeight: 200,
       includeSelectAllOption: true,
       enableFiltering: true});
-    $('#starttime').datetimepicker();
-    $('#endtime').datetimepicker();
+    $('#starttime').datetimepicker({format: "DD/MM/YYYY HH:mm", sideBySide: true});
+    $('#endtime').datetimepicker({format: "DD/MM/YYYY HH:mm", sideBySide: true});
   },
   render: function() {
     return (
