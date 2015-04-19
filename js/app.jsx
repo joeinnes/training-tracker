@@ -521,9 +521,9 @@ var TrainingAdd = React.createClass({
     payload.trainername = $('#trainername').val();
     nanobar.go(33);
     payload.trainees = $('#trainees').val();
-    payload.starttime = moment($('#starttime').val()).unix();
+    payload.starttime = moment($('#starttime').val(), "DD/MM/YYYY HH:mm").unix();
     nanobar.go(90);
-    payload.endtime = moment($('#endtime').val()).unix();
+    payload.endtime = moment($('#endtime').val(), "DD/MM/YYYY HH:mm").unix();
     var duration = (payload.endtime - payload.starttime)/60;
     console.log('Payload built!');
     console.log(payload);
