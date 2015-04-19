@@ -387,7 +387,11 @@ var UserForm = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     if ( this.state.name === "" || this.state.empid === 0 || this.state.email === "" || this.state.type === " " ) {
-      alert('Please fill in all fields!');
+      swal({
+        title: "Empty fields",
+        text: "Please make sure all fields are filled in.",   
+        type: "error",
+        confirmButtonText: "OK" });
     } else {
       console.log(this.state);
     }
