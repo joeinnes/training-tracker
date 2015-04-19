@@ -54,6 +54,13 @@ var UserList = React.createClass({
     }); // For each item in this.props.data, pass on the item to the User component and return the full component
     return (
       <table className="userNodes table table-striped table-condensed">
+        <tr>
+          <th>Name</th>
+          <th>Email address</th>
+          <th>Employee ID</th>
+          <th>Employee Type</th>
+          <th>Completed courses</th>
+        </tr>
         {userNodes}
       </table>
     ); // Return all of the users in a table
@@ -79,6 +86,9 @@ var User = React.createClass({
         </td>
         <td className="email">
           {this.props.user.email}
+        </td>
+        <td className="empid">
+          {this.props.user.empid}
         </td>
         <td className="type">
           {this.state.usertype}
@@ -107,7 +117,7 @@ var ItemList = React.createClass({
         );
       });
       return (
-        <select multiple="multiple" className="itemListSelectable form-control">
+        <select id={this.props.componentId} multiple="multiple" className="itemListSelectable form-control">
           {itemNodes}
         </select>
       );
@@ -152,6 +162,12 @@ var TrainingList = React.createClass({
     });
     return (
       <table className="trainingNodes table table-striped table-condensed">
+        <tr>
+          <th>Name</th>
+          <th>Summary</th>
+          <th>Type</th>
+          <th>Prerequisites</th>
+        </tr>
         {trainingNodes}
       </table>
     );
@@ -216,8 +232,8 @@ var SingleUser = React.createClass({
   render: function() {
     return (
       <div className="row">
-        <h1>{this.props.user.name} <span className="label label-success pull-right">{this.state.usertype}</span></h1>
-        <p>{this.props.user.email} {this.props.user.empid}</p>
+        <h1>{this.props.user.name} <small>{this.props.user.empid}</small><span className="pull-right"><span className="label label-success">{this.state.usertype}</span><br /></span></h1>
+        <p>{this.props.user.email}</p>
         <div className="col-md-4">
           <h2>Completed</h2>
           <ItemList items={this.props.user.coursesCompleted} />
@@ -267,144 +283,6 @@ var SingleCourseBox = React.createClass({
           </div>
         </div>
       </div>
-    );
-  }
-});
-
-
-/* ============================= Forms ============================= */
-
-/* The UserForm component allows a user to be quick-added. It has space for a name, an email address, and the usertype
-TODO:
-Add submit functionality
- - Validate data
- - Pass current form values to Ajax call to submit to user table
- - Respond with alert (eg: added successfully, user could not be added because... etc.)
- - Clear current form
-*/
-var UserForm = React.createClass({
-  handleSubmit: function(e) {
-    e.preventDefault();
-  },
-  componentDidMount: function() {
-    $('select').multiselect({
-      maxHeight: 200,
-      includeSelectAllOption: true,
-      enableFiltering: true
-    });
-  },
-  render: function() {
-    return (
-      <form className="userForm form-inline" onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label for="name">Name</label>
-          <input id="name" type="text" placeholder="Johnnie Walker" ref="name" className="form-control" />
-        </div>
-        <div className="form-group">
-          <label for="email">Email</label>
-          <input id="email" type="text" placeholder="johnnie@walker.com" ref="email" className="form-control" />
-        </div>
-        <div className="form-group">
-          <label for="type">Type</label>
-          <select id="type" ref="select" className="form-control">
-            <option id="Trainee">Trainee</option>
-            <option id="Trainer">Trainer</option>
-            <option id="Admin">Admin</option>
-          </select>
-        </div>
-        <button type="submit" className="btn btn-primary form-control">Submit</button>
-      </form>
-    );
-  }
-});
-
-/* The TrainingForm component allows a training to be quick-added.
-TODO:
-Add submit functionality
- - Validate data
- - Pass current form values to Ajax call to submit to trainings table
- - Respond with alert (eg: added successfully, training could not be added because... etc.)
- - Clear current form
-*/
-var TrainingForm = React.createClass({
-  handleSubmit: function(e) {
-    e.preventDefault();
-  },
-  componentDidMount: function() {
-    $('select').multiselect({
-      maxHeight: 200,
-      includeSelectAllOption: true,
-      enableFiltering: true
-    });
-  },
-  render: function() {
-    return (
-      <form className="trainingForm form-inline" onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label for="course-name">Course name</label>
-          <input id="course-name" type="text" placeholder="Basic training" ref="name" className="form-control" />
-        </div>
-        <div className="form-group">
-          <label for="summary">Course name</label>
-          <input type="text" placeholder="Training summary" ref="summary" className="form-control" />
-        </div>
-        <div className="form-group">
-          <label for="course-list">Prerequisites</label>
-          <ItemList selectable items={namesFromObj(trainingData)} />
-        </div>
-        <button type="submit" className="btn btn-primary form-control">Submit</button>
-      </form>
-    );
-  }
-});
-
-var TrainingAdd = React.createClass({
-  getInitialState: function() {
-    return { userNames: "", trainers: [] }
-  },
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var name = React.findDOMNode(this.refs.name).value.trim();
-    var summary = React.findDOMNode(this.refs.summary).value.trim();
-    if (!summary || !name) {
-      return;
-    }
-    // TODO: send request to the server
-    React.findDOMNode(this.refs.name).value = '';
-    React.findDOMNode(this.refs.summary).value = '';
-    return;
-  },
-  componentWillMount: function() {
-    for ( var i = 0; i < userData.length; i++ ) {
-      if ( userData[i].type === 1 ) {
-        this.state.trainers.push(userData[i].name);
-      }
-    }
-  },
-  componentDidMount: function() {
-    $('select').multiselect({
-      maxHeight: 200,
-      includeSelectAllOption: true,
-      enableFiltering: true
-    });
-  },
-  render: function() {
-    return (
-      <form className="trainingAddForm form-inline" onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label for="course-name">Course name</label>
-            <ItemList selectable items={namesFromObj(trainingData)} />
-        </div>
-        <div className="form-group">
-          <label for="summary">Trainer</label>
-            <ItemList selectable items={this.state.trainers} />
-        </div>
-        <div className="form-group">
-          <label for="user-list">Users</label>
-          <ItemList selectable items={namesFromObj(userData)} />
-        </div>
-        <button type="submit" className="btn btn-primary form-control">Submit</button>
-      </form>
     );
   }
 });
@@ -479,6 +357,180 @@ var SingleSession = React.createClass({
           </tr>
         )
       }
+  }
+});
+
+/* ============================= Forms ============================= */
+
+/* The UserForm component allows a user to be quick-added. It has space for a name, an email address, and the usertype
+TODO:
+Add submit functionality
+ - Validate data
+ - Pass current form values to Ajax call to submit to user table
+ - Respond with alert (eg: added successfully, user could not be added because... etc.)
+ - Clear current form
+*/
+var UserForm = React.createClass({
+  getInitialState: function() {
+    return { name: "", empid: 0, email: "", type: "" }
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    if ( this.state.name === "" || this.state.empid === 0 || this.state.email === "" || this.state.type === " " ) {
+      alert('Please fill in all fields!');
+    } else {
+      console.log(this.state);
+    }
+  },
+  handleNameChange: function(e) {
+    this.setState({name: e.target.value});
+  },
+  handleEmpIDChange: function(e) {
+    this.setState({empid: e.target.value});
+  },
+  handleEmailChange: function(e) {
+    this.setState({email: e.target.value});
+  },
+  componentDidMount: function() {
+    $('select').multiselect({
+      maxHeight: 200,
+      includeSelectAllOption: true,
+      enableFiltering: true
+    });
+  },
+  render: function() {
+    return (
+      <form className="userForm form-inline" onSubmit={this.handleSubmit}>
+        <div className="form-group">
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Johnnie Walker" onChange={this.handleNameChange} ref="name" className="form-control" />
+        </div>
+        <div className="form-group">
+          <label for="empid">Employee ID</label>
+          <input id="empid" type="text" placeholder="0000102" onChange={this.handleEmpIDChange} ref="empid" className="form-control" />
+        </div>
+        <div className="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="text" placeholder="johnnie@walker.com" onChange={this.handleEmailChange} ref="email" className="form-control" />
+        </div>
+        <div className="form-group">
+          <label for="type">Type</label>
+          <select id="type" ref="select" onChange={this.handleTypeChange} className="form-control">
+            <option value="2">Trainee</option>
+            <option value="1">Trainer</option>
+            <option value="0">Admin</option>
+          </select>
+        </div>
+        <button type="submit" className="btn btn-primary form-control">Submit</button>
+      </form>
+    );
+  }
+});
+
+/* The TrainingForm component allows a training to be quick-added.
+TODO:
+Add submit functionality
+ - Validate data
+ - Pass current form values to Ajax call to submit to trainings table
+ - Respond with alert (eg: added successfully, training could not be added because... etc.)
+ - Clear current form
+*/
+var TrainingForm = React.createClass({
+  handleSubmit: function(e) {
+    e.preventDefault();
+  },
+  componentDidMount: function() {
+    $('select').multiselect({
+      maxHeight: 200,
+      includeSelectAllOption: true,
+      enableFiltering: true
+    });
+  },
+  render: function() {
+    return (
+      <form className="trainingForm form-inline" onSubmit={this.handleSubmit}>
+        <div className="form-group">
+          <label for="course-name">Course name</label>
+          <input id="course-name" type="text" placeholder="Basic training" ref="name" className="form-control" />
+        </div>
+        <div className="form-group">
+          <label for="summary">Summary</label>
+          <input type="text" placeholder="Training summary" ref="summary" className="form-control" />
+        </div>
+        <div className="form-group">
+          <label for="summary">Type</label>
+          <ItemList selectable items={["On-boarding", "In service"]} />
+        </div>
+        <div className="form-group">
+          <label for="course-list">Prerequisites</label>
+          <ItemList selectable items={namesFromObj(trainingData)} />
+        </div>
+        <button type="submit" className="btn btn-primary form-control">Submit</button>
+      </form>
+    );
+  }
+});
+
+var TrainingAdd = React.createClass({
+  getInitialState: function() {
+    return { userNames: "", trainers: [], payload: {} }
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var payload = {};
+    payload.trainingname = $('#trainingname').val();
+    payload.trainername = $('#trainername').val();
+    payload.trainees = $('#trainees').val();
+    payload.starttime = $('#starttime').val();
+    payload.endtime = $('#endtime').val();
+    console.log('Payload built!');
+  },
+  componentWillMount: function() {
+    for ( var i = 0; i < userData.length; i++ ) {
+      if ( userData[i].type === 1 ) {
+        this.state.trainers.push(userData[i].name);
+      }
+    }
+  },
+  componentDidMount: function() {
+    $('select').multiselect({
+      maxHeight: 200,
+      includeSelectAllOption: true,
+      enableFiltering: true});
+    $('#starttime').datetimepicker();
+    $('#endtime').datetimepicker();
+  },
+  render: function() {
+    return (
+      <div className="row">
+        <form className="trainingAddForm form-inline" onSubmit={this.handleSubmit}>
+          <div className="form-group col-md-2">
+            <label for="course-name">Course name</label><br />
+              <ItemList componentId="trainingname" selectable items={namesFromObj(trainingData)} />
+          </div>
+          <div className="form-group col-md-2">
+            <label for="summary">Trainer</label><br />
+              <ItemList componentId="trainername" selectable items={this.state.trainers} />
+          </div>
+          <div className="form-group col-md-2">
+            <label for="user-list">Users</label><br />
+            <ItemList componentId="trainees" selectable items={namesFromObj(userData)} />
+          </div>
+          <div className="form-group col-md-2">
+            <label for="start-time">Start</label><br />
+            <input type="text" className="form-control" id='starttime' />
+          </div>
+          <div className="form-group col-md-2">
+            <label for="end-time">End</label><br />
+            <input type='text' className="form-control" id='endtime' />
+          </div>
+          <div className="form-group col-md-2">
+            <label for="submit">Ready?</label><br />
+            <button type="submit" className="btn btn-primary form-control submit-btn">Submit</button>
+          </div>
+        </form>
+    </div>
+    );
   }
 });
 

@@ -1,0 +1,29 @@
+{
+  "name": "Employee Training Tracker",
+  "version": "0.0.1",
+  "homepage": "https://github.com/joeinnes/training-tracker",
+  "authors": [
+    "joe@joeinn.es"
+  ],
+  "description": "Employee Training Tracker web app to log trainings",
+  "main": "index.html",
+  "keywords": [
+    "training",
+    "tracker",
+    "ISO9000",
+    "ISO9001"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "eonasdan-bootstrap-datetimepicker": "~4.7.14",
+    "react": "~0.13.2"
+  }
+}
