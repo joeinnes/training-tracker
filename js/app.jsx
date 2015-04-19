@@ -1,9 +1,4 @@
 /* Declare variables */
-var nanobar = new Nanobar({
-  bg: '#000',
-  id: 'load'
-});
-nanobar.go(10);
 
 var userData = [
 {name: "Pete Hunt", email: "pete.hunt@example.com", type: 2, coursesCompleted: ["Training 1", "Training 2"], empid: 8675309 },
@@ -386,24 +381,25 @@ var UserForm = React.createClass({
   },
   handleSubmit: function(e) {
     e.preventDefault();
-    if ( this.state.name === "" || this.state.empid === 0 || this.state.email === "" || this.state.type === " " ) {
+    //build payload
+    var payload = {};
+    payload.name = $('#username').val();
+    payload.empid = $('#userempid').val();
+    payload.email = $('#useremail').val();
+    payload.type = parseInt($('#usertype').val());
+    if ( payload.name && payload.empid && payload.email ) {
       swal({
-        title: "Empty fields",
-        text: "Please make sure all fields are filled in.",   
-        type: "error",
+        title: "Employee created",
+        text: payload.name + " has been added to the database, with employee id " + payload.empid + ", email " + payload.email + ' with the ' + userType(payload.type) + ' role.',
+        type: "success",
         confirmButtonText: "OK" });
     } else {
-      console.log(this.state);
+      swal({
+        title: "Empty fields",
+        text: "Please make sure all fields are filled in.",
+        type: "error",
+        confirmButtonText: "OK" });
     }
-  },
-  handleNameChange: function(e) {
-    this.setState({name: e.target.value});
-  },
-  handleEmpIDChange: function(e) {
-    this.setState({empid: e.target.value});
-  },
-  handleEmailChange: function(e) {
-    this.setState({email: e.target.value});
   },
   componentDidMount: function() {
     $('select').multiselect({
@@ -416,23 +412,23 @@ var UserForm = React.createClass({
     return (
       <form className="userForm form-inline" onSubmit={this.handleSubmit}>
         <div className="form-group">
-          <label for="name">Name</label>
-          <input id="name" type="text" placeholder="Johnnie Walker" onChange={this.handleNameChange} ref="name" className="form-control" />
+          <label for="username">Name</label>
+          <input id="username" type="text" placeholder="Johnnie Walker" ref="name" className="form-control" />
         </div>
         <div className="form-group">
-          <label for="empid">Employee ID</label>
-          <input id="empid" type="text" placeholder="0000102" onChange={this.handleEmpIDChange} ref="empid" className="form-control" />
+          <label for="userempid">Employee ID</label>
+          <input id="userempid" type="text" placeholder="0000102" ref="empid" className="form-control" />
         </div>
         <div className="form-group">
-          <label for="email">Email</label>
-          <input id="email" type="text" placeholder="johnnie@walker.com" onChange={this.handleEmailChange} ref="email" className="form-control" />
+          <label for="useremail">Email</label>
+          <input id="useremail" type="text" placeholder="johnnie@walker.com" ref="email" className="form-control" />
         </div>
         <div className="form-group">
-          <label for="type">Type</label>
-          <select id="type" ref="select" onChange={this.handleTypeChange} className="form-control">
-            <option value="2">Trainee</option>
-            <option value="1">Trainer</option>
-            <option value="0">Admin</option>
+          <label for="usertype">Type</label>
+          <select id="usertype" ref="select" className="form-control">
+            <option value={2}>Trainee</option>
+            <option value={1}>Trainer</option>
+            <option value={0}>Admin</option>
           </select>
         </div>
         <button type="submit" className="btn btn-primary form-control">Submit</button>
@@ -452,6 +448,25 @@ Add submit functionality
 var TrainingForm = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
+    var payload = {};
+    payload.name = $('#trainingname').val();
+    payload.summary = $('#trainingsummary').val();
+    payload.prereqs = $('#trainingprereqs').val();
+    payload.type = parseInt($('#trainingtype').val());
+    payload.time = parseInt($('#trainingtime').val());
+    if ( payload.name && payload.summary && payload.time ) {
+      swal({
+        title: "Course created",
+        text: payload.name + ' has been added to the database, described as "' + payload.summary + '", taking ' + payload.time + ' with the following prerequisites' + payload.prereqs + '.',
+        type: "success",
+        confirmButtonText: "OK" });
+    } else {
+      swal({
+        title: "Empty fields",
+        text: "Please make sure all fields are filled in.",
+        type: "error",
+        confirmButtonText: "OK" });
+    }
   },
   componentDidMount: function() {
     $('select').multiselect({
@@ -462,25 +477,34 @@ var TrainingForm = React.createClass({
   },
   render: function() {
     return (
+      <div className="row">
       <form className="trainingForm form-inline" onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label for="course-name">Course name</label>
-          <input id="course-name" type="text" placeholder="Basic training" ref="name" className="form-control" />
+        <div className="form-group col-md-2">
+          <label for="trainingname">Course name</label><br />
+          <input id="trainingname" type="text" placeholder="Basic training" ref="name" className="form-control" />
         </div>
-        <div className="form-group">
-          <label for="summary">Summary</label>
-          <input type="text" placeholder="Training summary" ref="summary" className="form-control" />
+        <div className="form-group col-md-2">
+          <label for="trainingsummary">Summary</label><br />
+          <input id="trainingsummary" type="text" placeholder="Training summary" ref="summary" className="form-control" />
         </div>
-        <div className="form-group">
-          <label for="summary">Type</label>
-          <ItemList selectable items={["On-boarding", "In service"]} />
+        <div className="form-group col-md-2">
+          <label for="trainingtype">Type</label><br />
+          <ItemList componentId="trainingtype" selectable items={["On-boarding", "In service"]} />
         </div>
-        <div className="form-group">
-          <label for="course-list">Prerequisites</label>
-          <ItemList selectable items={namesFromObj(trainingData)} />
+        <div className="form-group col-md-2">
+          <label for="trainingprereqs">Prerequisites</label><br />
+          <ItemList selectable componentId="trainingprereqs" items={namesFromObj(trainingData)} />
         </div>
-        <button type="submit" className="btn btn-primary form-control">Submit</button>
+        <div className="form-group col-md-2">
+          <label for="trainingtime">Time to complete</label><br />
+          <input id="trainingtime" type="text" placeholder="60" ref="trainingtime" className="form-control" />
+        </div>
+        <div className="submit-btn-container col-md-2">
+          <label for="submit">Ready?</label><br />
+          <button type="submit" className="btn btn-primary form-control">Submit</button>
+        </div>
       </form>
+    </div>
     );
   }
 });
@@ -493,16 +517,30 @@ var TrainingAdd = React.createClass({
     e.preventDefault();
     nanobar.go(10);
     var payload = {};
-    payload.trainingname = $('#trainingname').val();
+    payload.coursename = $('#coursename').val();
     payload.trainername = $('#trainername').val();
     nanobar.go(33);
     payload.trainees = $('#trainees').val();
-    payload.starttime = $('#starttime').val();
+    payload.starttime = moment($('#starttime').val()).unix();
     nanobar.go(90);
-    payload.endtime = $('#endtime').val();
+    payload.endtime = moment($('#endtime').val()).unix();
+    var duration = (payload.endtime - payload.starttime)/60;
     console.log('Payload built!');
     console.log(payload);
     nanobar.go(100);
+    if ( payload.coursename && payload.trainername && payload.trainees && payload.starttime && payload.endtime && duration > 0 ) {
+      swal({
+        title: "Training added",
+        text: payload.coursename + ' has been added to the database, with the following attendees: "' + payload.trainees + '", taking ' + duration + ' minutes with ' + payload.trainername + ' leading the course.',
+        type: "success",
+        confirmButtonText: "OK" });
+    } else {
+      swal({
+        title: "There was a problem",
+        text: "Please make sure all fields are filled in, and that the end time is after the start time.",
+        type: "error",
+        confirmButtonText: "OK" });
+    }
   },
   componentWillMount: function() {
     for ( var i = 0; i < userData.length; i++ ) {
@@ -524,8 +562,8 @@ var TrainingAdd = React.createClass({
       <div className="row">
         <form className="trainingAddForm form-inline" onSubmit={this.handleSubmit}>
           <div className="form-group col-md-2">
-            <label for="course-name">Course name</label><br />
-              <ItemList componentId="trainingname" selectable items={namesFromObj(trainingData)} />
+            <label for="coursename">Course name</label><br />
+              <ItemList componentId="coursename" selectable items={namesFromObj(trainingData)} />
           </div>
           <div className="form-group col-md-2">
             <label for="summary">Trainer</label><br />
