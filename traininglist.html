@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>Training Tracker</title>
+  <script type="text/javascript" src="bower_components/nanobar/nanobar.min.js"></script>
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+  <link rel="stylesheet" type="text/css" href="bower_components/sweetalert/lib/sweet-alert.css">
+</head>
+<body>
+<script>
+var nanobar = new Nanobar({
+  bg: '#000',
+  id: 'load'
+});
+nanobar.go(10);
+</script>
+<header id="header">
+
+</header>
+  <div class="container">
+    <div id="trainingbox"></div>
+  </div>
+  <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
+  <script src="js/vendor/bootstrap-multiselect.js"></script>
+  <script type="text/javascript" src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="bower_components/sweetalert/lib/sweet-alert.min.js"></script>
+  <script src="bower_components/react/react.js"></script>
+  <script type="text/javascript" src="jsx/data/data.js"></script>
+  <script type="text/javascript" src="jsx/functions/global.js"></script>
+  <script src="build/traininglistBundle.js"></script>
+  <script>
+  nanobar.go(100);
+  </script>
+</body>
+</html>

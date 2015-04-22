@@ -25,6 +25,7 @@
     "bootstrap": "~3.3.4",
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",
     "react": "~0.13.2",
-    "nanobar": "~0.2.0"
+    "nanobar": "~0.2.0",
+    "sweetalert": "~0.5.0"
   }
 }

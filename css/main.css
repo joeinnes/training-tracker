@@ -1,1 +1,18 @@
-body{padding-top:70px}.multiselect{margin-right:5px}label,input,select{margin-right:5px}.submit-btn-container{text-align:center;vertical-align:middle}.submit-btn{display:inline}
+body {
+  padding-top: 70px;
+}
+.multiselect {
+  margin-right: 5px;
+}
+label,
+input,
+select {
+  margin-right: 5px;
+}
+.submit-btn-container {
+  text-align: center;
+  vertical-align: middle;
+}
+.submit-btn {
+  display: inline;
+}
