@@ -14,13 +14,16 @@ var TrainingList = React.createClass({
     });
     return (
       <table className="trainingNodes table table-striped table-condensed">
-        <tr>
-          <th>Name</th>
-          <th>Summary</th>
-          <th>Type</th>
-          <th>Prerequisites</th>
-        </tr>
-        {trainingNodes}
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <th>Summary</th>
+            <th>Type</th>
+            <th>Prerequisites</th>
+            <th></th>
+          </tr>
+          {trainingNodes}
+        </tbody>
       </table>
     );
   }

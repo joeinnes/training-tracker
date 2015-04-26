@@ -10,8 +10,10 @@ var TrainingForm = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     var payload = {};
-    var prereqs = $('#trainingprereqs').val().join(", ");
-
+    var prereqs;
+    if ( $('#trainingprereqs').val() ) {
+      prereqs = $('#trainingprereqs').val().join(", ");
+    }
     payload.name = $('#trainingname').val();
     payload.summary = $('#trainingsummary').val();
     payload.prereqs = prereqs;
@@ -24,6 +26,7 @@ var TrainingForm = React.createClass({
         text: payload.name + ' has been added to the database.',
         type: "success",
         confirmButtonText: "OK" });
+        location.reload();
     } else {
       swal({
         title: "Empty fields",
@@ -36,11 +39,16 @@ var TrainingForm = React.createClass({
     $.get('http://dev.local/api/trainings/?by=name&order=asc', function(result) {
       if (this.isMounted()) {
         this.setState({trainingData: namesFromObj(result)});
+        $('select').multiselect('rebuild');
       }
     }.bind(this));
+    $('select').multiselect({
+      maxHeight: 600,
+      includeSelectAllOption: true,
+      enableFiltering: true
+    });
   },
   render: function() {
-    $('select').multiselect('rebuild');
     return (
       <div className="row">
       <form className="trainingForm form-inline" onSubmit={this.handleSubmit}>

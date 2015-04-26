@@ -13,7 +13,7 @@ var Training = React.createClass({
     var type = courseType(this.props.training.type);
     var prereqs = this.props.training.prereqs;
     this.setState({trainingtype: type});
-    if (prereqs.length) {
+    if (prereqs) {
       prereqs = prereqs.split(", ");
     }
     this.setState({prereqs: prereqs});
@@ -33,8 +33,26 @@ var Training = React.createClass({
         <td className="prerequisites">
           <ItemList items={this.state.prereqs} />
         </td>
+        <td className="deleteTraining">
+          <button className="btn btn-danger" onClick={this.deleteTraining}>Delete</button>
+        </td>
       </tr>
     );
+  },
+  deleteTraining: function () {
+    name = this.props.training.name;
+    id = this.props.training.id;
+    swal({   title: "Are you sure?",
+       text: "You will not be able to recover this data!",
+       type: "warning",
+       showCancelButton: true,
+       confirmButtonColor: "#DD6B55",
+       confirmButtonText: "Yes, delete it!",
+       closeOnConfirm: false }, function() {
+         $.ajax({url: 'http://dev.local/api/trainings/'+ id, type: "DELETE"});
+         swal("Deleted!", name + " has been deleted.", "success");
+         location.reload();
+       });
   }
 });
 

@@ -5,7 +5,7 @@ var ItemList = require('./itemlist.js');
 
 var TrainingAdd = React.createClass({
   getInitialState: function() {
-    return { trainees: [], traineeData: {}, trainers: [], payload: {}, trainerData: {} }
+    return { trainees: [], traineeData: {}, trainers: [], payload: {}, trainerData: {}, trainingData: [] }
   },
   handleSubmit: function(e) {
     e.preventDefault();
@@ -56,6 +56,7 @@ var TrainingAdd = React.createClass({
         $('select').multiselect('rebuild');
       }
     }.bind(this));
+    // Calling the API twice is not the fastest way to do this...
     $.get('http://dev.local/api/users?by=name&order=asc', function(result) {
       if (this.isMounted()) {
         this.setState({traineeData: result});
@@ -69,6 +70,17 @@ var TrainingAdd = React.createClass({
         $('select').multiselect('rebuild');
       }
     }.bind(this));
+    $.get('http://dev.local/api/trainings/?by=name&order=asc', function(result) {
+      if (this.isMounted()) {
+        this.setState({trainingData: namesFromObj(result)});
+        $('select').multiselect('rebuild');
+      }
+    }.bind(this));
+    $('select').multiselect({
+      maxHeight: 600,
+      includeSelectAllOption: true,
+      enableFiltering: true
+    });
     $('select').multiselect({
       maxHeight: 600,
       includeSelectAllOption: true,
@@ -85,7 +97,7 @@ var TrainingAdd = React.createClass({
         <div className="col-md-6">
           <div className="form-group">
             <label for="coursename">Course name</label><br />
-              <ItemList componentId="coursename" selectable single items={namesFromObj(trainingData)} />
+              <ItemList componentId="coursename" selectable single items={this.state.trainingData} />
           </div>
           <div className="form-group">
             <label for="summary">Trainer</label><br />

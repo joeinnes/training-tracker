@@ -11,7 +11,6 @@ var UserBox = React.createClass({
     $.get('http://dev.local/api/users/?by=name&order=asc', function(result) {
       if (this.isMounted()) {
         this.setState({userData: result});
-        console.log(result);
       }
     }.bind(this));
   },
