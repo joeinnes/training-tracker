@@ -7,11 +7,16 @@ var ItemList = require('./itemlist.js');
 Props: training (single training object) */
 var Training = React.createClass({
   getInitialState: function() {
-    return { trainingtype: "" };
+    return { trainingtype: "", prereqs: [] };
   },
   componentWillMount: function () {
     var type = courseType(this.props.training.type);
+    var prereqs = this.props.training.prereqs;
     this.setState({trainingtype: type});
+    if (prereqs.length) {
+      prereqs = prereqs.split(", ");
+    }
+    this.setState({prereqs: prereqs});
   },
   render: function() {
     return (
@@ -26,7 +31,7 @@ var Training = React.createClass({
           {this.state.trainingtype}
         </td>
         <td className="prerequisites">
-          <ItemList items={this.props.training.prereqs} />
+          <ItemList items={this.state.prereqs} />
         </td>
       </tr>
     );

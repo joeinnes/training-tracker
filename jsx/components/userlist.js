@@ -5,11 +5,17 @@ var User = require('./user.js');
 
 var UserList = React.createClass({
   render: function() {
-    var userNodes = this.props.data.map(function (user) {
-      return (
-        <User user={user} />
-      );
-    }); // For each item in this.props.data, pass on the item to the User component and return the full component
+    var userNodes;
+    if ( this.props.data ) {
+      userNodes = this.props.data.map(function (user) {
+        return (
+          <User user={user} />
+        );
+      });
+    } else {
+      userNodes = "";
+    }
+   // For each item in this.props.data, pass on the item to the User component and return the full component
     return (
       <table className="userNodes table table-striped table-condensed">
         <tbody>

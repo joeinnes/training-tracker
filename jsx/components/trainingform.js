@@ -4,19 +4,24 @@
 var ItemList = require('./itemlist.js');
 
 var TrainingForm = React.createClass({
+  getInitialState: function() {
+    return { trainingData: [] }
+  },
   handleSubmit: function(e) {
     e.preventDefault();
     var payload = {};
+    var prereqs = $('#trainingprereqs').val().join(", ");
+
     payload.name = $('#trainingname').val();
     payload.summary = $('#trainingsummary').val();
-    payload.prereqs = $('#trainingprereqs').val();
+    payload.prereqs = prereqs;
     payload.type = parseInt($('#trainingtype').val());
     payload.time = parseInt($('#trainingtime').val());
     if ( payload.name && payload.summary && payload.time ) {
-      $.post('http://dev.local/api/trainings', payload);
+      $.post('http://dev.local/api/trainings/', payload);
       swal({
         title: "Course created",
-        text: payload.name + ' has been added to the database, described as "' + payload.summary + '", taking ' + payload.time + ' with the following prerequisites' + payload.prereqs + '.',
+        text: payload.name + ' has been added to the database.',
         type: "success",
         confirmButtonText: "OK" });
     } else {
@@ -28,13 +33,14 @@ var TrainingForm = React.createClass({
     }
   },
   componentDidMount: function() {
-    $('select').multiselect({
-      maxHeight: 200,
-      includeSelectAllOption: true,
-      enableFiltering: true
-    });
+    $.get('http://dev.local/api/trainings/?by=name&order=asc', function(result) {
+      if (this.isMounted()) {
+        this.setState({trainingData: namesFromObj(result)});
+      }
+    }.bind(this));
   },
   render: function() {
+    $('select').multiselect('rebuild');
     return (
       <div className="row">
       <form className="trainingForm form-inline" onSubmit={this.handleSubmit}>
@@ -52,7 +58,7 @@ var TrainingForm = React.createClass({
         </div>
         <div className="form-group col-md-2">
           <label for="trainingprereqs">Prerequisites</label><br />
-          <ItemList selectable componentId="trainingprereqs" items={namesFromObj(trainingData)} />
+          <ItemList selectable componentId="trainingprereqs" items={this.state.trainingData} />
         </div>
         <div className="form-group col-md-2">
           <label for="trainingtime">Time to complete</label><br />
