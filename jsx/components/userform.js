@@ -14,9 +14,10 @@ var UserForm = React.createClass({
       $.post('http://dev.local/api/users', payload);
       swal({
         title: "Employee created",
-        text: payload.name + " has been added to the database, with employee id " + payload.empid + ", email " + payload.email + ' with the ' + userType(payload.type) + ' role.',
+        text: payload.name + " has been added to the database!",
         type: "success",
         confirmButtonText: "OK" });
+        location.reload();
     } else {
       swal({
         title: "Empty fields",
